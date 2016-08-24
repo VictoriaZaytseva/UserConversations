@@ -5,5 +5,5 @@ package models
   */
 case class Conversation (creator: String,
                          creation_time: String,
-                         message_count: String
-                         )
+                         message_count: String,
+                         messages: IndexedSeq[Message])

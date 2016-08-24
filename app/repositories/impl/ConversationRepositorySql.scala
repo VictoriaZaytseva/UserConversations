@@ -19,7 +19,7 @@ class ConversationRepositorySql extends ConversationRepository with Repository[C
 
   override def constructor(): Conversation = {}
 
-  override def findById(userId: Int, conversationId: String): Future[Try[Conversation]] = {
+  override def findById(userId: Int, conversationId: String): Future[Try[Int]] = {
     queryOne(findById, Seq[Any]())
   }
   override def update(id: Int): Future[Try[Conversation]] = {
