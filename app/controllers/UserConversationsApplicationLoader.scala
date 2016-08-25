@@ -33,7 +33,6 @@ class UserConversations(context: Context)  extends BuiltInComponentsFromContext(
   lazy val conversationRepository = new ConversationRepositorySql()
   lazy val messageRepository = new MessageRepositorySql()
   lazy val conversationServiceDefault = new ConversationServiceDefault(database, userRepository, messageRepository, conversationRepository)
-
   lazy val applicationController = new controllers.Application(conversationServiceDefault)
   lazy val assets = new controllers.Assets(httpErrorHandler)
 

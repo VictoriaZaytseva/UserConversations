@@ -1,7 +1,8 @@
 package repositories.impl
 
-import com.github.mauricio.async.db.Connection
+import com.github.mauricio.async.db.{Connection, RowData}
 import models.User
+import org.joda.time.DateTime
 import repositories.{Repository, UserRepository}
 
 import scala.concurrent.Future
@@ -17,8 +18,14 @@ class UserRepositorySql extends UserRepository with Repository[User]{
   val qMarks = ""
 
   val SelectOneById = ""
-  override def constructor(): User = {
-  }
+
+  override def constructor(row: RowData): User = User(
+    id = row("id").asInstanceOf[Int],
+    username = row("username").asInstanceOf[String],
+    fullname = row("full_name").asInstanceOf[String],
+    age = row("age").asInstanceOf[Int]
+  )
+
   override def findById(id: Int)(implicit conn: Connection): Future[Try[User]] = {
     queryOne(SelectOneById, Seq[Any](id))
   }

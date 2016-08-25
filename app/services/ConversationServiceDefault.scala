@@ -30,7 +30,7 @@ class ConversationServiceDefault(val db: DB,
     transactional { implicit conn: Connection =>
       val fMessage = for {
         conversation <- conversationRepository.findById(sender, conversationId)
-        message <- messageRepository.create(Message(text = text, sender = sender, recepient = recepient))
+        message <- messageRepository.create(Message(text = text, sender = sender, recipient = recepient, conversationId = conversationId))
       } yield message
       fMessage
     }

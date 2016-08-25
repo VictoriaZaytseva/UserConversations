@@ -2,10 +2,9 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import play.libs.Json
 import services.ConversationServiceDefault
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -33,7 +32,7 @@ class Application(conversationService: ConversationServiceDefault) extends Contr
       request.body.validate[MessagePostForm].fold(
         valid = postForm => {
           conversationService.addMessage(postForm.senderId, conversationId, postForm.message, postForm.recipient_id).map{
-            case Success(message) => Ok(Json.toJson("Message "+message+" was added"))
+            case Success(message) => Ok(Json.toJson(message))
             case Failure(ex) => BadRequest(ex.toString)
           }
         },
