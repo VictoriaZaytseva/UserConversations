@@ -6,7 +6,7 @@ import play.libs.Json
 import services.ConversationServiceDefault
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 

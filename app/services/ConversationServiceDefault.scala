@@ -4,7 +4,7 @@ import com.github.mauricio.async.db.Connection
 import models.{Conversation, Message}
 import repositories.{ConversationRepository, MessageRepository, UserRepository}
 import services.Service
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 /**

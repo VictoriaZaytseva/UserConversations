@@ -2,6 +2,7 @@ package helpers
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait Converting {
 

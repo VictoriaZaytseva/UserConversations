@@ -1,11 +1,12 @@
 package repositories.impl
 
+import com.github.mauricio.async.db.Connection
 import models.{Conversation, User}
 import repositories.{ConversationRepository, Repository}
 
 import scala.concurrent.Future
 import scala.util.Try
-
+import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by victoria on 21/08/16.
   */
@@ -19,10 +20,10 @@ class ConversationRepositorySql extends ConversationRepository with Repository[C
 
   override def constructor(): Conversation = {}
 
-  override def findById(userId: Int, conversationId: String): Future[Try[Int]] = {
+  override def findById(userId: Int, conversationId: String)(implicit conn: Connection): Future[Try[Int]] = {
     queryOne(findById, Seq[Any]())
   }
-  override def update(id: Int): Future[Try[Conversation]] = {
+  override def update(id: Int)(implicit conn: Connection): Future[Try[Conversation]] = {
     queryOne(update, Seq[Any]())
   }
 }
