@@ -10,4 +10,5 @@ GET	/user/:userId/conversation/:conversationId  controllers.Application.getMessa
 #text. This	endpoint	should	add	the	message	into	the	database	and	increase	the	number	of	messages	in
 #the	corresponding	conversation	(message	count)
 POST /conversation/:conversationId/message      controllers.Application.postMessage(conversationId: Int)
-    
+
+GET  /   controllers.Application.index

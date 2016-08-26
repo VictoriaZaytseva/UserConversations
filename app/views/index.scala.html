@@ -1,7 +1,19 @@
-@(message: String)
 
-@main("Welcome to Play") {
+<!DOCTYPE html>
 
-    @play20.welcome(message)
-
-}
+<html>
+    <head>
+        <title>Post a message</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
+    </head>
+    <body>
+        <form action="/conversation/1/message" method="post">
+            Sender id: <input type="text" name="sender_id"><br>
+            Recipient id: <input type="text" name="recipient_id"><br>
+            Text: <input type="text" name="text"><br>
+         <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>

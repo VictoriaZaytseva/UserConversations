@@ -45,4 +45,8 @@ class Application(conversationService: ConversationServiceDefault) extends Contr
         invalid = error => Future.successful{ BadRequest("invalid json")}
       )
   }
+
+  def index = Action {
+    Ok(views.html.index())
+  }
 }
