@@ -2,6 +2,7 @@ package repositories.impl
 
 import com.github.mauricio.async.db.{Connection, RowData}
 import models.{Message, User}
+import org.joda.time.DateTime
 import repositories.{MessageRepository, Repository}
 
 import scala.concurrent.Future
@@ -15,28 +16,10 @@ class MessageRepositorySql extends MessageRepository with Repository[Message]{
 
   val table = "messages"
 
-  val qMarks = ""
+  val findByConversationId = s"""select * from messages where conversation_id = ?"""
 
-  val findByConversationId = ""
-
-  val Insert = ""
-
-//  CREATE	TABLE	 messages	(
-//    id	serial primary key,
-//    text	text,
-//    created_at	timestamp with time zone	DEFAULT	NULL,
-//  sender int references users(id) on update CASCADE,
-//  recipient	int references users(id) on update CASCADE,
-//  conversation_id 	int references conversation(id) on update CASCADE);
-  /**
-    * id: Int,
-                   text: String,
-                   sender: Int,
-                   recepient: Int,
-                   conversationId: Int)
-    * @param row
-    * @return
-    */
+  val Insert = "insert into messages(text, created_at, sender, recipient, conversation_id) values(?, ?, ?, ?, ?)"
+//insert into messages(text, created_at, sender, recipient, conversation_id) values('hey!', CURRENT_TIMESTAMP, 1, 3, 1)
   override def constructor(row: RowData): Message = Message(
     id = row("id").asInstanceOf[Int],
     text = row("text").asInstanceOf[String],
@@ -46,11 +29,11 @@ class MessageRepositorySql extends MessageRepository with Repository[Message]{
   )
 
   override def create(message: Message)(implicit conn: Connection): Future[Try[Message]] = {
-    queryOne(Insert, Seq[Any]())
+    queryOne(Insert, Seq[Any](message.text, new DateTime(), message.sender, message.recipient, message.conversationId))
   }
 
-  override def getByConversationId(userId: Int, conversationId: Int)(implicit conn: Connection): Future[Try[IndexedSeq[Message]]] = {
-    queryList(findByConversationId, Seq[Any](userId, conversationId))
+  override def getByConversationId(conversationId: Int)(implicit conn: Connection): Future[Try[IndexedSeq[Message]]] = {
+    queryList(findByConversationId, Seq[Any](conversationId))
   }
 
 }

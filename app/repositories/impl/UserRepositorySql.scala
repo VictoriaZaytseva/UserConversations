@@ -13,11 +13,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by victoria on 21/08/16.
   */
 class UserRepositorySql extends UserRepository with Repository[User]{
+
   val table = "users"
 
-  val qMarks = ""
-
-  val SelectOneById = ""
+  val SelectOneById = s"""select * from users where id = ?"""
 
   override def constructor(row: RowData): User = User(
     id = row("id").asInstanceOf[Int],

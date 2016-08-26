@@ -1,7 +1,8 @@
 package repositories.impl
 
-import com.github.mauricio.async.db.Connection
+import com.github.mauricio.async.db.{Connection, RowData}
 import models.{Conversation, User}
+import org.joda.time.DateTime
 import repositories.{ConversationRepository, Repository}
 
 import scala.concurrent.Future
@@ -15,15 +16,20 @@ class ConversationRepositorySql extends ConversationRepository with Repository[C
 
   val qMarks = ""
 
-  val findById = ""
-  val update = ""
+  val findById = s"""select * from conversation where id = ?"""
+  val update = "update conversations set message_count = ? where id = ?"
 
-  override def constructor(): Conversation = {}
+  override def constructor(row: RowData): Conversation = Conversation(
+    id = row("id").asInstanceOf[Int],
+    creator = row("creator_id").asInstanceOf[Int],
+    createdAt = row("create_at").asInstanceOf[DateTime],
+    messageCount = row("message_count").asInstanceOf[Int]
+  )
 
-  override def findById(userId: Int, conversationId: Int)(implicit conn: Connection): Future[Try[Conversation]] = {
-    queryOne(findById, Seq[Any]())
+  override def findById(conversationId: Int)(implicit conn: Connection): Future[Try[Conversation]] = {
+    queryOne(findById, Seq[Any](conversationId))
   }
-  override def update(id: Int)(implicit conn: Connection): Future[Try[Conversation]] = {
-    queryOne(update, Seq[Any]())
+  override def update(id: Int, messageCount: Int)(implicit conn: Connection): Future[Try[Conversation]] = {
+    queryOne(update, Seq[Any](messageCount, id))
   }
 }

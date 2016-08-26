@@ -11,5 +11,5 @@ import scala.util.Try
   */
 trait MessageRepository {
   def create(message: Message)(implicit conn: Connection): Future[Try[Message]]
-  def getByConversationId(userId: Int, conversationId: Int)(implicit conn: Connection): Future[Try[IndexedSeq[Message]]]
+  def getByConversationId(conversationId: Int)(implicit conn: Connection): Future[Try[IndexedSeq[Message]]]
 }

@@ -18,8 +18,8 @@ class ConversationServiceDefault(val db: DB,
   def fetchConversation(userId: Int, conversationId: Int): Future[Try[Conversation]] ={
     transactional { implicit conn: Connection =>
       val fConversation = for {
-        messages <- convFuture(messageRepository.getByConversationId(userId, conversationId))
-        conversationWithoutMessages <- convFuture(conversationRepository.findById(userId, conversationId))
+        messages <- convFuture(messageRepository.getByConversationId(conversationId))
+        conversationWithoutMessages <- convFuture(conversationRepository.findById(conversationId))
         conversation = Try(conversationWithoutMessages.copy(messages = messages))
       } yield conversation
       fConversation
@@ -29,7 +29,8 @@ class ConversationServiceDefault(val db: DB,
   def addMessage(sender: Int, conversationId: Int, text: String, recepient: Int): Future[Try[Message]] = {
     transactional { implicit conn: Connection =>
       val fMessage = for {
-        conversation <- conversationRepository.findById(sender, conversationId)
+        conversation <- convFuture(conversationRepository.findById(conversationId))
+        updatedConversation <- conversationRepository.update(conversationId, conversation.messageCount+1)
         message <- messageRepository.create(Message(text = text, sender = sender, recipient = recepient, conversationId = conversationId))
       } yield message
       fMessage
