@@ -3,6 +3,7 @@ package repositories.impl
 import com.github.mauricio.async.db.{Connection, RowData}
 import models.{Conversation, User}
 import org.joda.time.DateTime
+import org.omg.CORBA.LongHolder
 import repositories.{ConversationRepository, Repository}
 
 import scala.concurrent.Future
@@ -20,11 +21,10 @@ class ConversationRepositorySql extends ConversationRepository with Repository[C
   val update = "update conversations set message_count = ? where id = ?"
 
   override def constructor(row: RowData): Conversation = Conversation(
-    id = row("id").asInstanceOf[Int],
-    creator = row("creator_id").asInstanceOf[Int],
+    id = row("id").asInstanceOf[Integer],
+    creator = row("creator_id").asInstanceOf[Integer],
     createdAt = row("create_at").asInstanceOf[DateTime],
-    messageCount = row("message_count").asInstanceOf[Int]
-  )
+    messageCount = row("message_count").asInstanceOf[Int])
 
   override def findById(conversationId: Int)(implicit conn: Connection): Future[Try[Conversation]] = {
     queryOne(findById, Seq[Any](conversationId))

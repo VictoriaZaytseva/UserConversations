@@ -5,11 +5,7 @@ import play.api.libs.json._
 /**
   * Created by victoria on 20/08/16.
   */
-case class Message(id: Int = 0,
-                   text: String,
-                   sender: Int,
-                   recipient: Int,
-                   conversationId: Int)
+case class Message(id: Int = 0, text: String, sender: Int, recipient: Int, conversationId: Int)
 object Message {
   implicit val messageWrites: Writes[Message] = (
     (__ \ "id").write[Int] and

@@ -16,17 +16,15 @@ class MessageRepositorySql extends MessageRepository with Repository[Message]{
 
   val table = "messages"
 
-  val findByConversationId = s"""select * from messages where conversation_id = ?"""
+  val findByConversationId = s"""select * from messages where conversation_id = ? ORDER BY created_at DESC """
 
   val Insert = "insert into messages(text, created_at, sender, recipient, conversation_id) values(?, ?, ?, ?, ?)"
 //insert into messages(text, created_at, sender, recipient, conversation_id) values('hey!', CURRENT_TIMESTAMP, 1, 3, 1)
   override def constructor(row: RowData): Message = Message(
-    id = row("id").asInstanceOf[Int],
-    text = row("text").asInstanceOf[String],
-    sender = row("sender").asInstanceOf[Int],
-    recipient = row("recipient").asInstanceOf[Int],
-    conversationId = row("conversation_id").asInstanceOf[Int]
-  )
+  id = row("id").asInstanceOf[Integer], text = row("text").asInstanceOf[String],
+  sender = row("sender").asInstanceOf[Integer],
+  recipient = row("recipient").asInstanceOf[Integer],
+  conversationId = row("conversation_id").asInstanceOf[Integer])
 
   override def create(message: Message)(implicit conn: Connection): Future[Try[Message]] = {
     queryOne(Insert, Seq[Any](message.text, new DateTime(), message.sender, message.recipient, message.conversationId))

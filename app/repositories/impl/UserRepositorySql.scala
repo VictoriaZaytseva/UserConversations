@@ -18,12 +18,7 @@ class UserRepositorySql extends UserRepository with Repository[User]{
 
   val SelectOneById = s"""select * from users where id = ?"""
 
-  override def constructor(row: RowData): User = User(
-    id = row("id").asInstanceOf[Int],
-    username = row("username").asInstanceOf[String],
-    fullname = row("full_name").asInstanceOf[String],
-    age = row("age").asInstanceOf[Int]
-  )
+  override def constructor(row: RowData): User = User(id = row("id").asInstanceOf[Int], username = row("username").asInstanceOf[String], fullname = row("full_name").asInstanceOf[String], age = row("age").asInstanceOf[Int])
 
   override def findById(id: Int)(implicit conn: Connection): Future[Try[User]] = {
     queryOne(SelectOneById, Seq[Any](id))

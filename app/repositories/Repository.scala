@@ -1,5 +1,6 @@
 package repositories
 
+import scala.util.control.NonFatal
 import play.api.db._
 import play.api.mvc._
 import com.github.mauricio.async.db.exceptions.ConnectionStillRunningQueryException
@@ -24,8 +25,6 @@ trait Repository[A] {
     }
     fRes.map {
       res => buildEntityList(res.rows, constructor)
-    }.recover {
-      case exception => throw exception
     }
   }
 
@@ -38,8 +37,6 @@ trait Repository[A] {
     }
     fRes.map {
       res => buildEntity(res.rows, constructor)
-    }.recover {
-      case exception: ConnectionStillRunningQueryException => throw exception
     }
   }
 
@@ -47,16 +44,16 @@ trait Repository[A] {
     maybeResultSet match {
       case Some(resultSet) => resultSet.headOption match {
         case Some(firstRow) => Try(build(firstRow))
-        case None => throw new Exception
+        case None => Try(throw new  RuntimeException("no")).
       }
-        case None =>  throw new Exception
+        case None =>  Try(throw new Exception("Can't build the entity2"))
       }
     }
 
   protected def buildEntityList[B](maybeResultSet: Option[ResultSet], build: RowData => B): Try[IndexedSeq[B]] = {
     maybeResultSet match {
       case Some(resultSet) =>Try(resultSet.map(build))
-      case None => throw new Exception
+      case None => Try(throw new Exception("3"))
     }
   }
 

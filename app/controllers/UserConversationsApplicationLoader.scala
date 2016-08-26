@@ -36,7 +36,7 @@ class UserConversations(context: Context)  extends BuiltInComponentsFromContext(
   lazy val applicationController = new controllers.Application(conversationServiceDefault)
   lazy val assets = new controllers.Assets(httpErrorHandler)
 
-  override def router: Router = new Routes(httpErrorHandler, assets)
+  override def router: Router = new Routes(httpErrorHandler, assets, applicationController) withPrefix "/"
 }
 
 class UserConversationsApplicationLoader extends ApplicationLoader {

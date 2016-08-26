@@ -6,12 +6,7 @@ import play.api.libs.json._
 /**
   * Created by victoria on 20/08/16.
   */
-case class Conversation (
-                          id: Int,
-                          creator: Int,
-                          createdAt: DateTime,
-                          messageCount: Int,
-                          messages: IndexedSeq[Message] = IndexedSeq())
+case class Conversation(id: Int, creator: Int, createdAt: DateTime, messageCount: Int, messages: IndexedSeq[Message] = IndexedSeq())
 
 
 object Conversation {

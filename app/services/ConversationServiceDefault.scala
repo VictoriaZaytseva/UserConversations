@@ -18,10 +18,10 @@ class ConversationServiceDefault(val db: DB,
   def fetchConversation(userId: Int, conversationId: Int): Future[Try[Conversation]] ={
     transactional { implicit conn: Connection =>
       val fConversation = for {
-        messages <- convFuture(messageRepository.getByConversationId(conversationId))
         conversationWithoutMessages <- convFuture(conversationRepository.findById(conversationId))
-        conversation = Try(conversationWithoutMessages.copy(messages = messages))
-      } yield conversation
+        messages <- convFuture(messageRepository.getByConversationId(conversationId))
+        conversation = conversationWithoutMessages.copy(messages = messages)
+      } yield Try(conversation)
       fConversation
     }
   }
