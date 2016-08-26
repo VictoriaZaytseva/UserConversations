@@ -5,12 +5,13 @@ package services
   */
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.github.mauricio.async.db.Connection
-import helpers.Converting
+import fail.{ErrorUnion, RepositoryError}
+import helpers.{Converting, Lifting}
 
 import scala.concurrent.Future
 import services.DB
 
-trait Service extends Converting{
+trait Service extends Converting with Lifting[ErrorUnion#Fail]{
   /**
     * Database connection (pool). Services will take connections from
     * this pool when making repository calls.

@@ -5,9 +5,11 @@ import play.api.mvc._
 import services.ConversationServiceDefault
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import fail._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
+import scalaz.{-\/, \/-}
 
 class Application(conversationService: ConversationServiceDefault) extends Controller {
 
@@ -23,8 +25,10 @@ class Application(conversationService: ConversationServiceDefault) extends Contr
 
   def getMessages(userId: Int, conversationId: Int) = Action.async { implicit request =>
     conversationService.fetchConversation(userId, conversationId).map{
-      case Success(conversation) => Ok(Json.toJson(conversation))
-      case Failure(ex) => BadRequest(ex.toString)
+      case \/-(conversation) => Ok(Json.toJson(conversation))
+      case -\/(error: RepositoryError.DatabaseError) => InternalServerError("Error in the database")
+      case -\/(error: RepositoryError.QueryError) => BadRequest("Wrong data")
+      case -\/(error: RepositoryError.NoResults) => NotFound("Cant find the data in the database")
     }
   }
 
@@ -32,8 +36,10 @@ class Application(conversationService: ConversationServiceDefault) extends Contr
       request.body.validate[MessagePostForm].fold(
         valid = postForm => {
           conversationService.addMessage(postForm.senderId, conversationId, postForm.message, postForm.recipient_id).map{
-            case Success(message) => Ok(Json.toJson(message))
-            case Failure(ex) => BadRequest(ex.toString)
+            case \/-(message) => Ok(Json.toJson(message))
+            case -\/(error: RepositoryError.DatabaseError) => InternalServerError("Error in the database")
+            case -\/(error: RepositoryError.QueryError) => BadRequest("Wrong data")
+            case -\/(error: RepositoryError.NoResults) => NotFound("Cant find the data in the database")
           }
         },
         invalid = error => Future.successful{ BadRequest("invalid json")}

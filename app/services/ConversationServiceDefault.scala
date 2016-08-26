@@ -1,12 +1,15 @@
 package services
 
 import com.github.mauricio.async.db.Connection
+import fail.{ErrorUnion, RepositoryError}
 import models.{Conversation, Message}
 import repositories.{ConversationRepository, MessageRepository, UserRepository}
 import services.Service
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
+import scalaz.\/
 /**
   * Created by victoria on 21/08/16.
   */
@@ -15,25 +18,25 @@ class ConversationServiceDefault(val db: DB,
                                  val messageRepository: MessageRepository,
                                  val conversationRepository: ConversationRepository) extends Service{
 
-  def fetchConversation(userId: Int, conversationId: Int): Future[Try[Conversation]] ={
+  def fetchConversation(userId: Int, conversationId: Int): Future[\/[ErrorUnion#Fail, Conversation]] ={
     transactional { implicit conn: Connection =>
       val fConversation = for {
-        conversationWithoutMessages <- convFuture(conversationRepository.findById(conversationId))
-        messages <- convFuture(messageRepository.getByConversationId(conversationId))
+        conversationWithoutMessages <- lift(conversationRepository.findById(conversationId))
+        messages <- lift(messageRepository.getByConversationId(conversationId))
         conversation = conversationWithoutMessages.copy(messages = messages)
-      } yield Try(conversation)
-      fConversation
+      } yield conversation
+      fConversation.run
     }
   }
 
-  def addMessage(sender: Int, conversationId: Int, text: String, recepient: Int): Future[Try[Message]] = {
+  def addMessage(sender: Int, conversationId: Int, text: String, recepient: Int): Future[\/[ErrorUnion#Fail, Message]] = {
     transactional { implicit conn: Connection =>
       val fMessage = for {
-        conversation <- convFuture(conversationRepository.findById(conversationId))
-        updatedConversation <- conversationRepository.update(conversationId, conversation.messageCount+1)
-        message <- messageRepository.create(Message(text = text, sender = sender, recipient = recepient, conversationId = conversationId))
+        conversation <- lift(conversationRepository.findById(conversationId))
+        updatedConversation <- lift(conversationRepository.update(conversationId, conversation.messageCount+1))
+        message <- lift(messageRepository.create(Message(text = text, sender = sender, recipient = recepient, conversationId = conversationId)))
       } yield message
-      fMessage
+      fMessage.run
     }
   }
 }
