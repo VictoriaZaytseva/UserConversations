@@ -1,5 +1,8 @@
 package fail
 
+/**
+  * Custom errors for pattern matching
+  */
 sealed trait ErrorUnion {
   sealed trait Fail
 }
@@ -15,7 +18,7 @@ sealed trait QueryErrorT extends ErrorUnion {
 sealed trait NoResultsT extends ErrorUnion {
   case class NoResults(message: String) extends Fail
 }
-// other types of error may follow
+// repository errors. with ErrorInion we can have different error groups in the future
 object RepositoryError
   extends DatabaseErrorT
     with NoResultsT

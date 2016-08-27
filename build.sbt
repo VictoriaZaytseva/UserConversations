@@ -13,7 +13,6 @@ libraryDependencies ++= Seq( jdbc ,
   "com.typesafe.play" %% "play-jdbc-evolutions" % "2.4.0",
   "com.github.mauricio" %% "postgresql-async" % "0.2.18",
   "joda-time" % "joda-time" % "2.1",
-  "org.spire-math" %% "cats" % "0.2.0",
   "org.scalaz" %% "scalaz-core" % "7.1.4",
   "org.scalaz" %% "scalaz-concurrent" % "7.1.4",
   specs2 % Test )

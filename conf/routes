@@ -1,14 +1,8 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                           controllers.Assets.at(path="/public", file)
-#This	endpoint	retrieves a	list	of	messages	in	a	conversation	(newest	on	top)
+
 GET	/user/:userId/conversation/:conversationId  controllers.Application.getMessages(userId: Int, conversationId: Int)
-#The	post	endpoint	should	take	as	body	parameters	the	recipient_id,	the	sender_id	and	the	message
-#text. This	endpoint	should	add	the	message	into	the	database	and	increase	the	number	of	messages	in
-#the	corresponding	conversation	(message	count)
+
 POST /conversation/:conversationId/message      controllers.Application.postMessage(conversationId: Int)
 
-GET  /   controllers.Application.index

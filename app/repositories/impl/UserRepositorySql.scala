@@ -16,8 +16,6 @@ import scalaz.\/
   */
 class UserRepositorySql extends UserRepository with Repository[User]{
 
-  val table = "users"
-
   val SelectOneById = s"""select * from users where id = ?"""
 
   override def constructor(row: RowData): User = User(id = row("id").asInstanceOf[Int], username = row("username").asInstanceOf[String], fullname = row("full_name").asInstanceOf[String], age = row("age").asInstanceOf[Int])

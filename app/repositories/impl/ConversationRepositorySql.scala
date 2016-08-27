@@ -4,23 +4,18 @@ import com.github.mauricio.async.db.{Connection, RowData}
 import fail.{RepositoryError}
 import models.{Conversation, User}
 import org.joda.time.DateTime
-import org.omg.CORBA.LongHolder
 import repositories.{ConversationRepository, Repository}
-
 import scala.concurrent.Future
-import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 import scalaz.\/
 /**
-  * Created by victoria on 21/08/16.
+  * A class to work with conversation table
   */
 class ConversationRepositorySql extends ConversationRepository with Repository[Conversation]{
-  val table = "conversations"
-
-  val qMarks = ""
-
+  //queries
   val findById = s"""select * from conversation where id = ?"""
-  val update = "update conversations set message_count = ? where id = ?"
+
+  val update = "update conversation set message_count = ? where id = ? returning id, creator_id, create_at, message_count"
 
   override def constructor(row: RowData): Conversation = Conversation(
     id = row("id").asInstanceOf[Integer],

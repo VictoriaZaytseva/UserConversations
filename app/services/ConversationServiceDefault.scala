@@ -3,6 +3,7 @@ package services
 import com.github.mauricio.async.db.Connection
 import fail.{ErrorUnion, RepositoryError}
 import models.{Conversation, Message}
+import play.api.Logger
 import repositories.{ConversationRepository, MessageRepository, UserRepository}
 import services.Service
 
@@ -10,15 +11,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 import scalaz.\/
-/**
-  * Created by victoria on 21/08/16.
-  */
+
 class ConversationServiceDefault(val db: DB,
                                  val userRepository: UserRepository,
                                  val messageRepository: MessageRepository,
-                                 val conversationRepository: ConversationRepository) extends Service{
+                                 val conversationRepository: ConversationRepository) extends ConversationService{
 
-  def fetchConversation(userId: Int, conversationId: Int): Future[\/[ErrorUnion#Fail, Conversation]] ={
+  override def fetchConversation(userId: Int, conversationId: Int): Future[\/[ErrorUnion#Fail, Conversation]] ={
     transactional { implicit conn: Connection =>
       val fConversation = for {
         conversationWithoutMessages <- lift(conversationRepository.findById(conversationId))
@@ -29,7 +28,7 @@ class ConversationServiceDefault(val db: DB,
     }
   }
 
-  def addMessage(sender: Int, conversationId: Int, text: String, recepient: Int): Future[\/[ErrorUnion#Fail, Message]] = {
+  override def addMessage(sender: Int, conversationId: Int, text: String, recepient: Int): Future[\/[ErrorUnion#Fail, Message]] = {
     transactional { implicit conn: Connection =>
       val fMessage = for {
         conversation <- lift(conversationRepository.findById(conversationId))

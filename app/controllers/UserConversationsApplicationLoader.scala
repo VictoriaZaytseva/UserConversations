@@ -12,9 +12,14 @@ import repositories.impl.{ConversationRepositorySql, MessageRepositorySql, UserR
 import play.api.{ApplicationLoader, BuiltInComponentsFromContext}
 import router.Routes
 
-class UserConversations(context: Context)  extends BuiltInComponentsFromContext(context){
+/**
+  * Application loader class to instantiate the application
+  * @param context
+  */
+class UserConversations(context: Context) extends BuiltInComponentsFromContext(context){
+  // database config
  val dbConfig: Configuration = new Configuration(
-   username = configuration.getString("db.postgresql.username").getOrElse("krispii_user"),
+   username = configuration.getString("db.postgresql.username").getOrElse("app"),
    host = configuration.getString("db.postgresql.host").getOrElse("localhost"),
    password = configuration.getString("db.postgresql.password"),
    database = configuration.getString("db.postgresql.database"),
@@ -29,13 +34,18 @@ class UserConversations(context: Context)  extends BuiltInComponentsFromContext(
 
   lazy val database: DB = new PostgresDB(dbConfig, poolConfig)
 
+  //repositories
   lazy val userRepository = new UserRepositorySql()
   lazy val conversationRepository = new ConversationRepositorySql()
   lazy val messageRepository = new MessageRepositorySql()
-  lazy val conversationServiceDefault = new ConversationServiceDefault(database, userRepository, messageRepository, conversationRepository)
-  lazy val applicationController = new controllers.Application(conversationServiceDefault)
-  lazy val assets = new controllers.Assets(httpErrorHandler)
 
+  //service
+  lazy val conversationServiceDefault = new ConversationServiceDefault(database, userRepository, messageRepository, conversationRepository)
+  //controller
+  lazy val applicationController = new controllers.Application(conversationServiceDefault)
+  //assets
+  lazy val assets = new controllers.Assets(httpErrorHandler)
+  // routes object
   override def router: Router = new Routes(httpErrorHandler, assets, applicationController) withPrefix "/"
 }
 

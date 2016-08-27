@@ -2,26 +2,33 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import services.ConversationServiceDefault
+import services.{ConversationService, ConversationServiceDefault}
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import fail._
+import play.api.data._
+import play.api.data.Forms._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import scalaz.{-\/, \/-}
 
-class Application(conversationService: ConversationServiceDefault) extends Controller {
 
-  case class MessagePostForm(recipient_id: Int, senderId: Int, message: String)
+/**
+  * I can make more specific error messages bu thats not the point, so i hope these ones will suffice
+  */
+class Application(conversationService: ConversationService) extends Controller {
 
-  object MessagePostForm {
-    implicit val postReads = (
-      (__ \ "recipient_id").read[Int] and
-        (__ \ "sender_id").read[Int] and
-        (__ \ "text").read[String]
-      )(MessagePostForm.apply _)
-  }
+  case class MessagePost(recipient_id: Int, senderId: Int, text: String)
+
+  val MessagePostForm = Form(
+    mapping(
+      "sender_id" -> number,
+      "recipient_id" -> number,
+      "text" -> nonEmptyText
+    )(MessagePost.apply)(MessagePost.unapply)
+  )
 
   def getMessages(userId: Int, conversationId: Int) = Action.async { implicit request =>
     conversationService.fetchConversation(userId, conversationId).map{
@@ -32,21 +39,17 @@ class Application(conversationService: ConversationServiceDefault) extends Contr
     }
   }
 
-  def postMessage(conversationId: Int) = Action.async(parse.json) { implicit request =>
-      request.body.validate[MessagePostForm].fold(
-        valid = postForm => {
-          conversationService.addMessage(postForm.senderId, conversationId, postForm.message, postForm.recipient_id).map{
+  def postMessage(conversationId: Int) = Action.async(parse.anyContent) { implicit request =>
+      MessagePostForm.bindFromRequest().fold(
+        formWithErrors => Future.successful{ BadRequest(formWithErrors.toString)},
+        postForm => {
+          conversationService.addMessage(postForm.senderId, conversationId, postForm.text, postForm.recipient_id).map{
             case \/-(message) => Ok(Json.toJson(message))
             case -\/(error: RepositoryError.DatabaseError) => InternalServerError("Error in the database")
             case -\/(error: RepositoryError.QueryError) => BadRequest("Wrong data")
             case -\/(error: RepositoryError.NoResults) => NotFound("Cant find the data in the database")
           }
-        },
-        invalid = error => Future.successful{ BadRequest("invalid json")}
+        }
       )
-  }
-
-  def index = Action {
-    Ok(views.html.index())
   }
 }

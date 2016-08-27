@@ -20,6 +20,13 @@ trait Repository[A] extends Lifting[RepositoryError.Fail]{
 
   def constructor(row: RowData): A
 
+  /**
+    * Query several rows of data
+     * @param queryText
+    * @param parameters
+    * @param conn
+    * @return
+    */
   protected def queryList(queryText: String, parameters: Seq[Any] = Seq.empty[Any]) // format: OFF
                          (implicit conn: Connection): Future[\/[RepositoryError.Fail, IndexedSeq[A]]] = { // format: ON
     val fRes = if (parameters.nonEmpty) {
@@ -39,6 +46,13 @@ trait Repository[A] extends Lifting[RepositoryError.Fail]{
     }
   }
 
+  /**
+    * query just 1 row
+     * @param queryText
+    * @param parameters
+    * @param conn
+    * @return
+    */
   def queryOne(queryText: String, parameters: Seq[Any] = Seq.empty[Any])(implicit conn: Connection): Future[\/[RepositoryError.Fail, A]]= {
     val fRes = if (parameters.nonEmpty) {
       conn.sendPreparedStatement(queryText, parameters)
@@ -58,6 +72,13 @@ trait Repository[A] extends Lifting[RepositoryError.Fail]{
     }
   }
 
+  /**
+    * build one entity
+    * @param maybeResultSet
+    * @param build
+    * @tparam B
+    * @return
+    */
   protected def buildEntity[B](maybeResultSet: Option[ResultSet], build: RowData => B): \/[RepositoryError.Fail, B] = {
     maybeResultSet match {
       case Some(resultSet) => resultSet.headOption match {
@@ -68,6 +89,13 @@ trait Repository[A] extends Lifting[RepositoryError.Fail]{
       }
     }
 
+  /**
+    * build the list of entities
+    * @param maybeResultSet
+    * @param build
+    * @tparam B
+    * @return
+    */
   protected def buildEntityList[B](maybeResultSet: Option[ResultSet], build: RowData => B): \/[RepositoryError.Fail, IndexedSeq[B]] = {
     maybeResultSet match {
       case Some(resultSet) => \/-(resultSet.map(build))

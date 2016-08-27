@@ -6,10 +6,6 @@ import com.github.mauricio.async.db.postgresql.pool.PostgreSQLConnectionFactory
 import com.github.mauricio.async.db.pool.{ConnectionPool, PoolConfiguration}
 import com.typesafe.config.ConfigFactory
 
-/**
-  * Created by victoria on 23/08/16.
-  */
-
 trait DB {
   val dbconfig: Configuration
   def pool: Connection
